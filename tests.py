@@ -6,7 +6,7 @@ from http.client import HTTPConnection
 
 HOST = "localhost"
 PORT = 8000
-PATH = "/hanoi"
+PATH = "/api/hanoi"
 
 def post_json(payload, content_type="application/json"):
     conn = HTTPConnection(HOST, PORT, timeout=5)
@@ -27,13 +27,13 @@ def main():
     time.sleep(0.3)
 
     # 1) Caso feliz: n=3
-    status, data = post_json({"n": 3})
+    status, data = post_json({"size": 3})
     assert status == 200, f"Status inesperado: {status}"
     assert isinstance(data, list) and len(data) == 7, f"Pasos esperados 7, obtuve {len(data)}"
     print("OK: n=3 produce 7 pasos")
 
     # 2) Content-Type incorrecto -> []
-    status, data = post_json({"n": 3}, content_type="text/plain")
+    status, data = post_json({"size": 3}, content_type="text/plain")
     assert status == 200 and data == [], "Debe devolver [] en content-type inválido"
     print("OK: content-type inválido devuelve []")
 
@@ -48,12 +48,12 @@ def main():
     print("OK: JSON inválido devuelve []")
 
     # 4) Límite n demasiado grande -> []
-    status, data = post_json({"n": 10**9})
+    status, data = post_json({"size": 10**9})
     assert status == 200 and data == [], "Debe devolver [] si n excede límites"
     print("OK: límite n grande devuelve []")
 
     # 5) Parámetros personalizados
-    status, data = post_json({"n": 2, "from": "X", "to": "Z", "aux": "Y"})
+    status, data = post_json({"size": 2, "from": "X", "to": "Z", "aux": "Y"})
     assert status == 200 and isinstance(data, list) and len(data) == 3
     pairs = set(tuple(m) for m in data)
     assert all(isinstance(m, list) and len(m) == 2 for m in data)

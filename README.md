@@ -21,6 +21,11 @@ This is a simple with 4 params
       aux: 2
    }
 ```
+CURL:
+```shell
+   curl -X POST http://127.0.0.1:8000/hanoi -H 'Content-Type: application/json' -d '{"size":3,"from":"A","to":"C","aux":"B"}'
+```
+
 ## How to test
 To have clean setup, please create an environment to handle the requirements
 ```shell
@@ -39,14 +44,14 @@ Then install deps
    pip install --no-cache-dir -r requirements.txt
 ```
 
+First run the app in local
+```shell
+   python3 app.py
+```
+
 If you want to run the tests do as follows
 ```shell
    python3 tests.py
-```
-
-If you want to run the app in local, pls run
-```shell
-   python3 app.py
 ```
 
 ## Deploy

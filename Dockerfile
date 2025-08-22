@@ -8,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Instalar dependencias del sistema (mínimas) y limpiar
+# Instalar dependencias del sistema & cleanup
 RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -23,8 +23,8 @@ COPY tests.py .
 # Exponer puerto
 EXPOSE 8000
 
-# Comando: gunicorn con workers según CPU, keep-alive agresivo
-# -w: workers = 2 * cores + 1 (suele estar OK por defecto)
+# Comando: gunicorn con workers
+# -w: workers = 2 * cores + 1 (99.9% Uptime)
 # --threads para mayor concurrencia sin bloquear
 CMD exec gunicorn app:app \
     --bind 0.0.0.0:${PORT} \

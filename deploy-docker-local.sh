@@ -21,7 +21,7 @@ echo ">> Salud rápida..."
 sleep 0.5
 curl -s -o /dev/null -w "HTTP %{http_code}\n" -X POST \
   -H "Content-Type: application/json" \
-  -d '{"n":3}' "http://localhost:${PORT}/hanoi" || true
+  -d '{"size":3,"from":"A","to":"C","aux":"B"}' "http://localhost:${PORT}/apihanoi" || true
 
 echo ">> Ejecuta pruebas funcionales (opcional):"
 echo "docker exec -it ${IMAGE_NAME} python tests.py"
