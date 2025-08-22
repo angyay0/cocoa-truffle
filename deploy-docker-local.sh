@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE_NAME="hanoi-flask"
+IMAGE_NAME="angel-hanoi-flask"
 PORT="${PORT:-8000}"
 MAX_N_ENV="${MAX_N:-14}"
 
@@ -17,11 +17,9 @@ docker run -d --name "${IMAGE_NAME}" -p "${PORT}:8000" \
   -e MAX_N="${MAX_N_ENV}" \
   "${IMAGE_NAME}:latest"
 
-echo ">> Salud rápida..."
+echo ">> Health check..."
 sleep 0.5
 curl -s -o /dev/null -w "HTTP %{http_code}\n" -X POST \
   -H "Content-Type: application/json" \
-  -d '{"size":3,"from":"A","to":"C","aux":"B"}' "http://localhost:${PORT}/apihanoi" || true
+  -d '{"size":3,"k":3}' "http://localhost:${PORT}/api/hanoi" || true
 
-echo ">> Ejecuta pruebas funcionales (opcional):"
-echo "docker exec -it ${IMAGE_NAME} python tests.py"

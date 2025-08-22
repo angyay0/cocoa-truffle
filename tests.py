@@ -1,4 +1,3 @@
-# tests.py
 import json
 import sys
 import time
@@ -23,17 +22,16 @@ def post_json(payload, content_type="application/json"):
     return resp.status, parsed
 
 def main():
-    # Espera breve por si el servidor acaba de iniciar
     time.sleep(0.3)
 
-    # 1) Caso feliz: n=3
-    status, data = post_json({"size": 3})
+    # 1) Happy path: n=3
+    status, data = post_json({"size": 3, "k": 3})
     assert status == 200, f"Status inesperado: {status}"
     assert isinstance(data, list) and len(data) == 7, f"Pasos esperados 7, obtuve {len(data)}"
     print("OK: n=3 produce 7 pasos")
 
     # 2) Content-Type incorrecto -> []
-    status, data = post_json({"size": 3}, content_type="text/plain")
+    status, data = post_json({"size": 3, "k": 3}, content_type="text/plain")
     assert status == 200 and data == [], "Debe devolver [] en content-type inválido"
     print("OK: content-type inválido devuelve []")
 
@@ -47,13 +45,13 @@ def main():
     assert resp.status == 200 and parsed == [], "Debe devolver [] en JSON inválido"
     print("OK: JSON inválido devuelve []")
 
-    # 4) Límite n demasiado grande -> []
-    status, data = post_json({"size": 10**9})
+    # 4) Limite n demasiado grande -> []
+    status, data = post_json({"size": 10**9, "k": 3})
     assert status == 200 and data == [], "Debe devolver [] si n excede límites"
     print("OK: límite n grande devuelve []")
 
-    # 5) Parámetros personalizados
-    status, data = post_json({"size": 2, "from": "X", "to": "Z", "aux": "Y"})
+    # 5) Parametros personalizados
+    status, data = post_json({"size": 2, "from": "X", "to": "Z", "pegs": ["X", "Y", "Z"]})
     assert status == 200 and isinstance(data, list) and len(data) == 3
     pairs = set(tuple(m) for m in data)
     assert all(isinstance(m, list) and len(m) == 2 for m in data)
