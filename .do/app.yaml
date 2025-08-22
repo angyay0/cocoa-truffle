@@ -1,0 +1,17 @@
+name: ${APP_NAME}
+services:
+  - name: api
+    image:
+      registry_type: DOCR
+      repository: ${DOCR_REGISTRY}/${APP_NAME}
+      tag: "TO_BE_SET"   # lo sobreescribimos en el workflow
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    http_port: 8000
+    routes:
+      - path: /
+    envs:
+      - key: PORT
+        value: "8000"
+      - key: MAX_N
+        value: "14"

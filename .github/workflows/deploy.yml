@@ -1,0 +1,56 @@
+name: Build & Deploy to DigitalOcean App Platform (Using DOCR Image)
+
+on:
+  workflow_dispatch:
+
+env:
+  APP_NAME: ${{ vars.APP_NAME }}
+  DOCR_REGISTRY: ${{ vars.DOCR_REGISTRY }}
+  APP_ID: ${{ vars.APP_ID }}
+  APP_PORT: ${{ vars.APP_PORT }}
+  MAX_N: ${{ vars.MAX_N }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Docker login to DOCR
+        run: doctl registry login
+
+      - name: Build & tag image
+        run: |
+          IMAGE="registry.digitalocean.com/${DOCR_REGISTRY}/${APP_NAME}:${GITHUB_SHA}"
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+          docker build -t "$IMAGE" .
+
+      - name: Push image to DOCR
+        run: |
+          docker push "$IMAGE"
+
+      #  autodeploy: production/latest
+      # - name: Tag as 'production' and push
+      #   if: github.ref == 'refs/heads/main'
+      #   run: |
+      #     PROD="registry.digitalocean.com/${DOCR_REGISTRY}/${APP_NAME}:production"
+      #     docker tag "$IMAGE" "$PROD"
+      #     docker push "$PROD"
+
+      - name: Prepare App Spec with current image tag
+        run: |
+          mkdir -p .do
+          # Copia el spec base y sustituye TO_BE_SET por el SHA
+          sed "s|TO_BE_SET|${GITHUB_SHA}|g" .do/app.yaml > .do/app.rendered.yaml
+          echo "Rendered spec:"
+          cat .do/app.rendered.yaml
+
+      - name: Update App with new spec (deploy)
+        run: |
+          doctl apps update "$APP_ID" --update-sources --spec .do/app.rendered.yaml
