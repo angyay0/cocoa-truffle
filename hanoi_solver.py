@@ -65,12 +65,12 @@ def hanoi_frame_stewart(n: int, pegs: tuple, src: str, dst: str, offset: int = 0
     if n <= 0:
         return []
     if n == 1:
-        return [[offset + 1, src, dst]]          # <-- incluye número de disco
+        return [[offset + 1, src, dst]]          # 
     if k < 3:
         return []
     if k == 3:
         aux = next(p for p in pegs if p not in (src, dst))
-        return _hanoi3_with_labels(n, src, dst, aux, offset)  # <-- clásico con offset
+        return _hanoi3_with_labels(n, src, dst, aux, offset) 
 
     # k > 3
     t = _best_t(n, k)
@@ -83,6 +83,6 @@ def hanoi_frame_stewart(n: int, pegs: tuple, src: str, dst: str, offset: int = 0
     # 2) mover los n-t discos grandes (offset+t .. offset+n-1) a dst con k-1 pegs (sin buffer)
     pegs_without_buffer = tuple(p for p in pegs if p != buffer_peg)
     steps += hanoi_frame_stewart(n - t, pegs_without_buffer, src, dst, offset=offset + t)
-    # 3) regresar los t pequeños del buffer al destino con k pegs
+    # 3) regresar los t  del buffer al destino con k pegs
     steps += hanoi_frame_stewart(t, pegs, buffer_peg, dst, offset=offset)
     return steps

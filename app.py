@@ -35,7 +35,7 @@ def hanoi():
     
     # Obtencion de parametros del body json
     n = data.get("size")
-    k = data.get("k") # Opcional, es la lista en numeros y por default va de 1 a la ultima
+    k = data.get("k")
     pegs_input = data.get("pegs")  # lista de pegs, aqui podemos especificarlas para definir de origen a destino
     src = data.get("from") # desde donde
     dst = data.get("to") # hasta donde
