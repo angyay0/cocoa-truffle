@@ -51,10 +51,9 @@ def main():
     print("OK: límite n grande devuelve []")
 
     # 5) Parametros personalizados
-    status, data = post_json({"size": 2, "from": "X", "to": "Z", "pegs": ["X", "Y", "Z"]})
+    status, data = post_json({"size": 2, "k":3, "from": "X", "to": "Z", "pegs": ["X", "Y", "Z"]})
     assert status == 200 and isinstance(data, list) and len(data) == 3
-    pairs = set(tuple(m) for m in data)
-    assert all(isinstance(m, list) and len(m) == 2 for m in data)
+    assert all(isinstance(m, list) and len(m) == 3 for m in data)
     print("OK: parámetros personalizados funcionan")
 
     print("\nTodas las pruebas funcionales pasaron ✔")
