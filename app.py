@@ -1,12 +1,13 @@
 import os
 import string
+import time
 from flask import Flask, request, jsonify
-from hanoi_solver import hanoi_frame_stewart
+from hanoi_solver import hanoi_frame_stewart,_min_moves
 
 app = Flask(__name__)
 
 # Limite seguro por defecto, si se especifica en ambiente puede cambiar
-MAX_N = int(os.getenv("MAX_N", "14"))  # 2^14-1 = 16383 pasos (JSON razonable)
+MAX_N = int(os.getenv("MAX_N", "51"))  # 2^14-1 = 16383 pasos (JSON razonable)
 
 # Modificación para soportar el algoritmo de Frame-Stewart
 def _default_pegs(k: int):
@@ -28,6 +29,8 @@ def hanoi():
     if request.content_type is None or "application/json" not in request.content_type.lower():
         # devolver arreglo vacío si inválido
         return jsonify([]), 200
+    
+    start = time.perf_counter()
 
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
@@ -39,6 +42,7 @@ def hanoi():
     pegs_input = data.get("pegs")  # lista de pegs, aqui podemos especificarlas para definir de origen a destino
     src = data.get("from") # desde donde
     dst = data.get("to") # hasta donde
+    count_only = bool(data.get("countOnly", False)) # para escenarios 20 y 50 (50 no se puede calcular)
 
     # Validaciones
     if not isinstance(n, int) or n < 0 or n > MAX_N:
@@ -65,8 +69,19 @@ def hanoi():
     # n==0 -> []
     if n == 0:
         return jsonify([]), 200
+    
+    if count_only or n > 20 :
+        k_eff = len(pegs_list)
+        total = _min_moves(n, k_eff)
+        elapsed = (time.perf_counter() - start) * 1000  
+        print(f"[LOG] /hanoi ejecutado en {elapsed:.2f} ms con disk={n} y torres={len(pegs_list)} count-only")
+        return jsonify({"moves": int(total)}), 200
 
     steps = hanoi_frame_stewart(n, tuple(pegs_list), src, dst)
+
+    elapsed = (time.perf_counter() - start) * 1000  
+    print(f"[LOG] /hanoi ejecutado en {elapsed:.2f} ms con disk={n} y torres={len(pegs_list)}")
+
     return jsonify(steps), 200
 
 if __name__ == "__main__":
